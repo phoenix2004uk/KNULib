@@ -1,3 +1,4 @@
+local safeStage is import("sys/safeStage").
 local execute is import("mnv/execute").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
