@@ -2,7 +2,7 @@ local execute is import("mnv/execute").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local TRN is bundle("trn/transferMun","trn/capture").
+local TRN is bundle(List("trn/transferMun","trn/capture")).
 
 local mission is import("missionRunner")(
 	List(
@@ -62,7 +62,7 @@ function preflight {
 	mission["enable"]("enablePowerSaving").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
-	RT["setTarget"]("mission-control","RelayAntenna50").
+	RT["setTarget"]("Mission Control","RelayAntenna50").
 
 	print "press any key to begin...".
 	TERMINAL:input:getChar().
@@ -86,8 +86,16 @@ function exec {
 }
 function transferToMun {
 	local res is TRN["transferMun"](25000).
-	if res = "wait" return.
-	else if res = "missed" mission["end"]().
+	if res = "wait" {
+		print "waiting for new transfer".
+		wait 10.
+		clearscreen.
+		return.
+	}
+	else if res = "missed" {
+		print "we missed".
+		mission["end"]().
+	}
 	else {
 		set burn to res.
 		mission["next"]().

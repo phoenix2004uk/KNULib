@@ -82,7 +82,7 @@ function inOrbit {
 	mission["enable"]("enablePowerSaving").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
-	RT["setTarget"]("mission-control","RelayAntenna50").
+	RT["setTarget"]("Mission Control","RelayAntenna50").
 
 	mission["next"]().
 }
