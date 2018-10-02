@@ -3,7 +3,7 @@
 	local maneuverTime is import("mnv/maneuverTime").
 	local setAlarm is import("util/setAlarm").
 	local exec is import("mnv/execute").
-	local RDV is bundle(List("rdv/transferAnomalyCirc","rdv/transferEtaCirc","mech/S")).
+	local TRN is bundle(List("trn/transferAnomalyCirc","trn/transferEtaCirc","mech/S")).
 
 	function calculateDV {
 		parameter newAp.
@@ -16,8 +16,8 @@
 // don't need to use this anymore, we can just check if Mun is the target body of our maneuver node instead
 //	// if Mun is between -15 and +30 degress of Minmus, we will enter Mun soi
 //	function munOccludesMinmusTransfers {
-//		local U0_mun is RDV["S"](Mun).
-//		local U0_minmus is RDV["S"](Minmus).
+//		local U0_mun is TRN["S"](Mun).
+//		local U0_minmus is TRN["S"](Minmus).
 //		local U0_delta is U0_mun - U0_minmus.
 //		return U0_delta >= -15 and U0_delta <= 30 .
 //	}
@@ -36,26 +36,27 @@
 		local dvMax is calculateDV(Minmus:altitude + Minmus:soiRadius).
 		local halfBurnDuration is maneuverTime(dv / 2, thrustFactor).
 
-		local Vtransfer is RDV["transferAnomalyCirc"](0, Minmus).
-		local nodeEta is RDV["transferEtaCirc"](Vtransfer, Minmus).
+		local Vtransfer is TRN["transferAnomalyCirc"](0, Minmus).
+		local nodeEta is TRN["transferEtaCirc"](Vtransfer, Minmus).
 
 		if nodeEta < halfBurnDuration {
 			return "wait".
 		}
 		local nodeTime is TIME:seconds + nodeEta.
 		local mnv is NODE(nodeTime, 0, 0, dv).
+		Add mnv.
 
 		// try and reduce periapsis to targetPe
 		// if not, but we are in Minmus soi, get bestDv value found
 		local minPe is Minmus:soiRadius.
 		local bestDv is 0.
-		until mnv:orbit:body = Minmus and mnv:orbit:periapsis <= targetPe {
+		until mnv:orbit:hasNextPatch and mnv:orbit:nextPatch:body = Minmus and mnv:orbit:nextPatch:periapsis <= targetPe {
 			set mnv:prograde to mnv:prograde + 0.005.
 
-			if mnv:orbit:body = Minmus {
-				set bestDv to mnv:orbit:prograde.
-				if mnv:orbit:periapsis <= minPe {
-					set minPe to mnv:orbit:periapsis.
+			if mnv:orbit:hasNextPatch and mnv:orbit:nextPatch:body = Minmus {
+				set bestDv to mnv:prograde.
+				if mnv:orbit:nextPatch:periapsis <= minPe {
+					set minPe to mnv:orbit:nextPatch:periapsis.
 				} else {
 					set mnv:prograde to mnv:prograde - 0.005.
 					break.
@@ -66,23 +67,24 @@
 				break.
 			}
 		}
-		if mnv:orbit:body <> Minmus {
+		if (not mnv:orbit:hasNextPatch) or mnv:orbit:nextPatch:body <> Minmus {
 			if bestDv > 0 {
 				set mnv:prograde to bestDv.
 			}
-			else if mnv:orbit:body = Mun {
-				return "occluded".
-			}
 			else {
-				return "missed".
+				Remove mnv.
+				if mnv:orbit:hasNextPatch and mnv:orbit:body = Mun {
+					return "occluded".
+				}
+				else {
+					return "missed".
+				}
 			}
 		}
 
 		set halfBurnDuration to maneuverTime(mnv:prograde / 2, thrustFactor).
 		local fullBurnDuration is maneuverTime(mnv:prograde, thrustFactor).
-		local alarm is setAlarm(nodeTime - halfBurnDuration, "transferMun " + round(mnv:orbit:periapsis/1000,3), margin).
-
-		ADD mnv.
+		local alarm is setAlarm(nodeTime - halfBurnDuration, "transferMun " + round(mnv:orbit:nextPatch:periapsis/1000,3), margin).
 
 		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
 	}).
