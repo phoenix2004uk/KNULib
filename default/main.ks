@@ -43,7 +43,7 @@ function orientCraft {
 	print "orientCraft":padRight(TERMINAL:width) AT (0,1).
 	local orient is VSL["orient"]().
 	if orient:isType("Direction") set orient to orient:vector.
-	if VANG(STEERING:vector,orient) > 1 {
+	if VANG(SHIP:facing:vector,orient) > 1 {
 		print "re-orienting":padRight(TERMINAL:width) AT (0,2).
 		lock STEERING to VSL["orient"]().
 	}
@@ -68,6 +68,19 @@ function disablePowerSaving {
 	}
 }
 
+function clearFlightpath {
+	until not HASNODE {
+		Remove NEXTNODE.
+		wait 1.
+	}
+	clearAlarms().
+}
+function clearAlarms {
+	for alarm in ListAlarms("All") {
+		DeleteAlarm(alarm:id).
+	}
+}
+
 function preflight {
 	print "preflight":padRight(TERMINAL:width) AT (0,1).
 	if STATUS <> "ORBITING" return.
@@ -75,16 +88,7 @@ function preflight {
 
 	lock STEERING to VSL["orient"]().
 
-	// delete any nodes
-	until not HASNODE {
-		Remove NEXTNODE.
-		wait 1.
-	}
-
-	// delete any alarms
-	for alarm in ListAlarms("All") {
-		DeleteAlarm(alarm:id).
-	}
+	clearFlightpath().
 
 	until STAGE:number = 0 safeStage().
 
@@ -95,13 +99,20 @@ function preflight {
 }
 function coast {
 	print "coast":padRight(TERMINAL:width) AT (0,1).
-	if burn["node"]:eta - 60 <= burn["preburn"]
+	if not (DEFINED burn) {
+		clearFlightpath().
+		mission["prev"]().
+	}
+	else if burn["node"]:eta - 60 <= burn["preburn"]
 		mission["next"]().
 }
 function exec {
 	print "exec":padRight(TERMINAL:width) AT (0,1).
-	MNV["execute"]().
-	mission["next"]().
+	if not HASNODE mission["prev"]().
+	else {
+		MNV["execute"]().
+		mission["next"]().
+	}
 }
 function changeAp500 {
 	print "changeAp500":padRight(TERMINAL:width) AT (0,1).
@@ -122,7 +133,7 @@ function checkApsides {
 }
 function changeInc10 {
 	print "changeInc10":padRight(TERMINAL:width) AT (0,1).
-	set burn to MNV["changeInc"](10,"highest").
+	set burn to MNV["changeInc"](10,"next").
 	mission["next"]().
 }
 function ellipticize08 {
@@ -149,7 +160,7 @@ function circularize {
 }
 function changeInc0 {
 	print "changeInc0":padRight(TERMINAL:width) AT (0,1).
-	set burn to MNV["changeInc"](0,"next").
+	set burn to MNV["changeInc"](0,"highest").
 	mission["next"]().
 }
 function changePe25 {
