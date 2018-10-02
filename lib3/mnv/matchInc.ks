@@ -45,7 +45,7 @@
 		if ORB["etaV"](nodes[whichNode]) < halfBurnDuration {
 			set nodeTime to nodeTime + SHIP:OBT:period.
 		}
-		local alarm is setAlarm(nodeTime - halfBurnDuration, "matchInc " + round(theta,1), margin).
+		local alarm is setAlarm(nodeTime - halfBurnDuration, "matchInc " + targetOrbitable:name, margin).
 		local mnv is NODE(nodeTime, dvRad, dvNrm, dvPro).
 		ADD mnv.
 
