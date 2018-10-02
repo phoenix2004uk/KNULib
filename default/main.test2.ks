@@ -1,26 +1,15 @@
-local safeStage is import("sys/safeStage").
-local MNV is bundleDir("mnv").
+local execute is import("mnv/execute").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
-local kerbinLaunch is import("asc/kerbinLaunch").
 local isFacing is import("util/isFacing").
+local TRN is bundle("trn/transferMun","trn/capture").
 
 local mission is import("missionRunner")(
 	List(
-"preflight",	preflight@,
-				launch@,
-				inOrbit@,
-"changeAp500",	changeAp500@,	coast@, exec@,
-				changePe500@,	coast@, exec@,
-				checkApsides@,
-				changeInc10@,	coast@, exec@,
-				ellipticize08@,	coast@, exec@,
-"wait",			waitForTarget@,
-				matchInc@,		coast@, exec@,
-				circularize@,	coast@, exec@,
-				changeInc0@,	coast@, exec@,
-				changePe25@,	coast@, exec@,
-"idle",			idleTillCrash@
+		preflight@,
+		transferToMun@,	coast@, exec@,
+		waitForMunSoi@,
+		captureAtPe@, coast@, exec@
 	),
 	List(
 		"orientCraft", orientCraft@,
@@ -65,24 +54,18 @@ function clearAlarms {
 }
 
 function preflight {
+	if STATUS <> "ORBITING" return.
 	if not (SHIP=KUNIVERSE:activeVessel and SHIP:unpacked) return.
 
-	clearFlightpath().
+	until STAGE:number = VSL["stages"]["orbital"] safeStage().
 
-	print "press any key to launch...".
-	TERMINAL:input:getChar().
-
-	mission["next"]().
-}
-function launch {
-	kerbinLaunch(100000, 90).
-	mission["next"]().
-}
-function inOrbit {
 	mission["enable"]("enablePowerSaving").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
 	RT["setTarget"]("mission-control","RelayAntenna50").
+
+	print "press any key to begin...".
+	TERMINAL:input:getChar().
 
 	mission["next"]().
 }
@@ -97,55 +80,26 @@ function coast {
 function exec {
 	if not HASNODE mission["prev"]().
 	else {
-		MNV["execute"]().
+		execute().
 		mission["next"]().
 	}
 }
-function changeAp500 {
-	set burn to MNV["changeAp"](500000).
-	mission["next"]().
-}
-function changePe500 {
-	set burn to MNV["changePe"](500000).
-	mission["next"]().
-}
-function checkApsides {
-	if ALT:apoapsis > 501000 or ALT:periapsis < 499000
-		mission["jump"]("changeAp500").
-	else
-		mission["next"]().
-}
-function changeInc10 {
-	set burn to MNV["changeInc"](10,"next").
-	mission["next"]().
-}
-function ellipticize08 {
-	set burn to MNV["ellipticize"](0.8, "Pe").
-	mission["next"]().
-}
-function waitForTarget {
-	if HASTARGET {
-		wait 10.
+function transferToMun {
+	local res is TRN["transferMun"](25000).
+	if res = "wait" return.
+	else if res = "missed" mission["end"]().
+	else {
+		set burn to res.
 		mission["next"]().
 	}
 }
-function matchInc {
-	set burn to MNV["matchInc"](TARGET).
-	mission["next"]().
+function waitForMunSoi {
+	if BODY = Mun {
+		wait 30.
+		mission["next"]().
+	}
 }
-function circularize {
-	set burn to MNV["circularize"]("Ap").
+function captureAtPe {
+	set burn to TRN["capture"](PERIAPSIS).
 	mission["next"]().
-}
-function changeInc0 {
-	set burn to MNV["changeInc"](0,"highest").
-	mission["next"]().
-}
-function changePe25 {
-	set burn to MNV["changePe"](25000).
-	mission["next"]().
-}
-function idleTillCrash {
-	mission["disable"]("orientCraft").
-	mission["disable"]("checkPowerSave").
 }
