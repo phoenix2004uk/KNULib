@@ -2,6 +2,7 @@ local safeStage is import("sys/safeStage").
 local MNV is bundleDir("mnv").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
+local kerbinLaunch is import("asc/kerbinLaunch").
 
 local L is bundleDir("trn").
 bundleDir("asc", L).
@@ -16,6 +17,8 @@ bundle(List("missionRunner","ord","sci"), L).
 local mission is import("missionRunner")(
 	List(
 "preflight",	preflight@,
+				launch@,
+				inOrbit@,
 "changeAp500",	changeAp500@,	coast@, exec@,
 				changePe500@,	coast@, exec@,
 				checkApsides@,
@@ -83,17 +86,36 @@ function clearAlarms {
 
 function preflight {
 	print "preflight":padRight(TERMINAL:width) AT (0,1).
-	if STATUS <> "ORBITING" return.
+	//if STATUS <> "ORBITING" return.
 	if not (SHIP=KUNIVERSE:activeVessel and SHIP:unpacked) return.
 
-	lock STEERING to VSL["orient"]().
+	//lock STEERING to VSL["orient"]().
 
 	clearFlightpath().
 
-	until STAGE:number = 0 safeStage().
+	//until STAGE:number = 0 safeStage().
 
+	//mission["enable"]("enablePowerSaving").
+	//mission["enable"]("orientCraft").
+
+	print "press any key to launch...".
+	TERMINAL:input:getChar().
+
+	mission["next"]().
+}
+function launch {
+	print "launch":padRight(TERMINAL:width) AT (0,1).
+
+	kerbinLaunch(100000, 90).
+
+	mission["next"]().
+}
+function inOrbit {
+	print "inOrbit":padRight(TERMINAL:width) AT (0,1).
 	mission["enable"]("enablePowerSaving").
 	mission["enable"]("orientCraft").
+	RT["activateAll"]().
+	RT["setTarget"]("mission-control","RelayAntenna50").
 
 	mission["next"]().
 }
