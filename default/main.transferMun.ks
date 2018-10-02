@@ -81,7 +81,9 @@ function coast {
 function exec {
 	if not HASNODE mission["prev"]().
 	else {
+		RT["activateAll"]().
 		execute().
+		enablePowerSaving().
 		mission["next"]().
 	}
 }
