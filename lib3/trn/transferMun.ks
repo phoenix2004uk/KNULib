@@ -23,12 +23,8 @@
 		local dvMax is calculateDV(Mun:altitude + Mun:soiRadius).
 		local halfBurnDuration is maneuverTime(dv / 2, thrustFactor).
 
-		print "initial deltaV calculations ["+round(dv,2)+" - "+round(dvMax,2)+"]".
-
 		local Vtransfer is TRN["transferAnomalyCirc"](0, Mun).
 		local nodeEta is TRN["transferEtaCirc"](Vtransfer, Mun).
-
-		print "transfer @"+round(Vtransfer,2)+" in "+round(nodeEta,2).
 
 		if nodeEta < halfBurnDuration {
 			return "wait".
@@ -67,8 +63,6 @@
 				return "missed".
 			}
 		}
-
-		print "found transfer of " + mnv:prograde + "m/s".
 
 		set halfBurnDuration to maneuverTime(mnv:prograde / 2, thrustFactor).
 		local fullBurnDuration is maneuverTime(mnv:prograde, thrustFactor).
