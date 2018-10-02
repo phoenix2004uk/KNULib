@@ -27,11 +27,11 @@
 		local nodeTime is TIME:seconds + ORB["etaV"](nodes[whichNode]).
 		local shipVelAtNode is velocityAt(SHIP, nodeTime):orbit.
 		local shipPosAtNode is positionAt(SHIP, nodeTime).
-		local targetVelAtNode is velocityAt(TARGET, nodeTime):orbit.
-		local targetPosAtNode is positionAt(TARGET, nodeTime) - positionAt(BODY, nodeTime).
+		local targetVelAtNode is velocityAt(targetOrbitable, nodeTime):orbit.
+		local targetPosAtNode is positionAt(targetOrbitable, nodeTime) - positionAt(BODY, nodeTime).
 		local shipNrmAtNode is VCRS(shipVelAtNode, shipPosAtNode).
 		local shipRadAtNode is VCRS(shipNrmAtNode, shipVelAtNode).
-		local lineOfNodes is VCRS( VCRS(-BODY:position, velocity:orbit), VCRS(TARGET:position-BODY:position, TARGET:OBT:velocity:orbit) ).
+		local lineOfNodes is VCRS( VCRS(-BODY:position, velocity:orbit), VCRS(targetOrbitable:position-BODY:position, targetOrbitable:OBT:velocity:orbit) ).
 		local newVel is shipVelAtNode:mag * ( AngleAxis(theta,lineOfNodes) * shipVelAtNode):normalized.
 
 		local deltaV is newVel - shipVelAtNode.
