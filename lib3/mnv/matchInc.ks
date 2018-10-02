@@ -41,6 +41,7 @@
 		local dvRad is VDOT(deltaV, shipRadAtNode:normalized).
 
 		local halfBurnDuration is maneuverTime(deltaV:mag / 2, thrustFactor).
+		local fullBurnDuration is maneuverTime(dv, thrustFactor).
 		if ORB["etaV"](nodes[whichNode]) < halfBurnDuration {
 			set nodeTime to nodeTime + SHIP:OBT:period.
 		}
@@ -48,6 +49,6 @@
 		local mnv is NODE(nodeTime, dvRad, dvNrm, dvPro).
 		ADD mnv.
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
 	}).
 }

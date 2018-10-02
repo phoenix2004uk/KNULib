@@ -16,6 +16,7 @@
 		parameter newPe, thrustFactor is 1, margin is 60.
 		local dv is calculateDV(newPe).
 		local halfBurnDuration is maneuverTime(dv / 2, thrustFactor).
+		local fullBurnDuration is maneuverTime(dv, thrustFactor).
 		local nodeTime is TIME:seconds + ETA:apoapsis.
 		if ETA:apoapsis < halfBurnDuration {
 			set nodeTime to nodeTime + SHIP:OBT:period.
@@ -24,6 +25,6 @@
 		local mnv is NODE(nodeTime, 0, 0, dv).
 		ADD mnv.
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
 	}).
 }

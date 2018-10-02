@@ -27,6 +27,7 @@
 		if whichNode = "DN" set dvNormal to -dvNormal.
 
 		local halfBurnDuration is maneuverTime(dvTotal / 2, thrustFactor).
+		local fullBurnDuration is maneuverTime(dv, thrustFactor).
 		local nodeTime is TIME:seconds + ORB["eta" + whichNode]().
 		if ORB["eta" + whichNode]() < halfBurnDuration {
 			set nodeTime to nodeTime + SHIP:OBT:period.
@@ -35,6 +36,6 @@
 		local mnv is NODE(nodeTime, 0, dvNormal, -dvPrograde).
 		ADD mnv.
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
 	}).
 }
