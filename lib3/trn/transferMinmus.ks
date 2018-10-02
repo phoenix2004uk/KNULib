@@ -51,14 +51,14 @@
 		local minPe is Minmus:soiRadius.
 		local bestDv is 0.
 		until mnv:orbit:hasNextPatch and mnv:orbit:nextPatch:body = Minmus and mnv:orbit:nextPatch:periapsis <= targetPe {
-			set mnv:prograde to mnv:prograde + 0.005.
+			set mnv:prograde to mnv:prograde + 0.001.
 
 			if mnv:orbit:hasNextPatch and mnv:orbit:nextPatch:body = Minmus {
 				set bestDv to mnv:prograde.
 				if mnv:orbit:nextPatch:periapsis <= minPe {
 					set minPe to mnv:orbit:nextPatch:periapsis.
 				} else {
-					set mnv:prograde to mnv:prograde - 0.005.
+					set mnv:prograde to mnv:prograde - 0.001.
 					break.
 				}
 			}
