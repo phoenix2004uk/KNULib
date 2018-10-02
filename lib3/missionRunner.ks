@@ -2,6 +2,7 @@
 //	enable(name)	// enable the event "name"
 //	disable(name)	// disable the event "name"
 //	next()			// proceed to next step in the sequence
+//	prev()			// jumps to the previous step
 //	jump(label)		// jump the mission to the named step "label"
 //	end()			// ends the mission (regardless of current step in the sequence)
 //  tag(name)		// sets the name of the mission, can only be called before run() is called
@@ -37,41 +38,30 @@
 		// to prevent events that are disabled before run, from over-writing a saved state
 		set runner["running"] to TRUE.
 
-		clearscreen.
-		print "loading state".
 		missionRunner_loadState(runner).
-		print runner["step"].
-		print runner["irq"].
-		wait 10.
-
 		missionRunner_saveState(runner).
-		print runner["step"].
-		print runner["irq"].
-		wait 10.
-		clearscreen.
 
 		local mission is Lex(
 			"enable",	missionRunner_enable@:bind(runner),
 			"disable",	missionRunner_disable@:bind(runner),
 			"next",		missionRunner_next@:bind(runner),
+			"prev",		missionRunner_previous@:bind(runner),
 			"jump",		missionRunner_jump@:bind(runner),
 			"end",		missionRunner_end@:bind(runner)
 		).
 
 		until runner["step"] = runner["seq"]:length {
-			print runner["step"] + " / " + runner["seq"]:length at (0,0).
+			// print runner["step"] + " / " + runner["seq"]:length at (0,0).
 			local step is runner["seq"][runner["step"]].
 			if noarg step(). else step(mission).
 			wait 0.
-			local iter is runner["irq"]:iterator.
-			until not iter:next {
-				local event is runner["evt"][iter:value].
+
+			for key in runner["evt"]:keys if runner["irq"]:contains(key) {
+				local event is runner["evt"][key].
 				if noarg event(). else event(mission).
 			}
 			wait 0.
 		}
-
-		print "mission finished".
 
 		missionRunner_cleanup(runner).
 	}
@@ -123,6 +113,11 @@
 			runner["irq"]:remove(index).
 			missionRunner_saveState(runner).
 		}
+	}
+	function missionRunner_previous {
+		parameter runner.
+		set runner["step"] to Max(0,runner["step"] - 1).
+		missionRunner_saveState(runner).
 	}
 	function missionRunner_next {
 		parameter runner.
@@ -182,6 +177,7 @@
 			"enable",	missionRunner_enable@:bind(runner),
 			"disable",	missionRunner_disable@:bind(runner),
 			"next",		missionRunner_next@:bind(runner),
+			"prev",		missionRunner_previous@:bind(runner),
 			"jump",		missionRunner_jump@:bind(runner),
 			"end",		missionRunner_end@:bind(runner)
 		).

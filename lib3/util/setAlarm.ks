@@ -1,7 +1,7 @@
 export({
-	parameter alarmTime, alarmName, margin is 30.
+	parameter alarmTime, alarmName, margin is 60.
 	if margin > 0 {
-		AddAlarm("Raw", alarmTime - margin, alarmName + " margin", "").
+		AddAlarm("Raw", alarmTime - margin, "margin", "").
 	}
-	AddAlarm("Raw", alarmTime, alarmName, "").
+	return AddAlarm("Raw", alarmTime, alarmName, "").
 }).
