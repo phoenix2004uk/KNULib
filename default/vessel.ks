@@ -3,16 +3,16 @@
 	export(Lex(
 
 		// TODO: don't want to use this
-		"launchProfile", "default",		// [required] local launchProfile is ASC["defaultProfile"].
+		"launchProfile", "alt",			// [optional] specifies the launch profile, otherwise a default is used
+		"launchTWR", 2.5,					// [optional] specifies the target TWR for ascent, otherwise a default is used
 
 		"stages", Lex(					// [required] information about staging, used during launch and landing
-			"insertion", 4,				// [required] last stage that can be used during launch
-
-			// TODO: orbital shouldn't be required - just stage until thrust is available after insertion stage is dropped
-			"orbital", 3,				// [required] stage to be in user after launch and orbital insertion
+			"lastAscent", 1,			// [required] last stage that can be used during launch
+			"insertion", 1,				// [required] stage used for orbital insertion, this can be the same as lastAscent
+			"orbital", 0,				// [required] stage to be in user after launch and orbital insertion, this can be the same as insertion
 
 			// TODO: should this really be necessary? we can just fire patachutes via part module event
-			"chutes", 1					// [optional] stage to fire parachutes when landing using normal landing procedure
+			"chutes", 0					// [optional] stage to fire parachutes when landing using normal landing procedure
 		),
 
 		"EC_POWERSAVE", List(3900,4100),
