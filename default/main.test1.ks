@@ -3,6 +3,7 @@ local MNV is bundleDir("mnv").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local kerbinLaunch is import("asc/kerbinLaunch").
+local isFacing is import("util/isFacing").
 
 local L is bundleDir("trn").
 bundleDir("asc", L).
@@ -43,19 +44,9 @@ mission["disable"]("orientCraft").
 mission["run"]().
 
 function orientCraft {
-	print "orientCraft":padRight(TERMINAL:width) AT (0,1).
-	local orient is VSL["orient"]().
-	if orient:isType("Direction") set orient to orient:vector.
-	if VANG(SHIP:facing:vector,orient) > 1 {
-		print "re-orienting":padRight(TERMINAL:width) AT (0,2).
-		lock STEERING to VSL["orient"]().
-	}
-	else {
-		print "stable":padRight(TERMINAL:width) AT (0,2).
-	}
+	if not isFacing(VSL["orient"]()) lock STEERING to VSL["orient"]().
 }
 function enablePowerSaving {
-	print "enablePowerSaving":padRight(TERMINAL:width) AT (0,1).
 	if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
 		RT["deactivateAll"]().
 		mission["disable"]("enablePowerSaving").
@@ -63,7 +54,6 @@ function enablePowerSaving {
 	}
 }
 function disablePowerSaving {
-	print "disablePowerSaving":padRight(TERMINAL:width) AT (0,1).
 	if SHIP:ElectricCharge > VSL["EC_POWERSAVE"][1] {
 		RT["activateAll"]().
 		mission["enable"]("enablePowerSaving").
