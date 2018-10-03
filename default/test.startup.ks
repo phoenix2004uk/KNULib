@@ -1,5 +1,7 @@
 clearscreen.
 import("vessel","1:/","1:/").
+SAS OFF.
+set SHIP:control:pilotMainThrottle to 0.
 
 // set some action groups
 ON AG1 {CORE:DoEvent("open terminal").PRESERVE.}

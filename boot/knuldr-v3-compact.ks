@@ -65,7 +65,6 @@ function notify {
 		return "0:/KSC/" + core:tag + "/" + filename.
 	}
 
-	set SHIP:control:pilotMainThrottle to 0.
 	if STATUS = "PRELAUNCH" {
 		if not HomeConnection:isConnected {
 			panic("no connection").

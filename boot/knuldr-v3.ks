@@ -117,7 +117,6 @@ function notify {
 		DeletePath("1:/main").
 	}
 
-	set SHIP:control:pilotMainThrottle to 0.
 	if STATUS = "PRELAUNCH" {
 		if not HomeConnection:isConnected {
 			panic("no connection").
