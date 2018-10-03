@@ -2,7 +2,7 @@ local safeStage is import("sys/safeStage").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local MNV is bundle(List("trn/transferMinmus","trn/capture", "mnv/custom", "mnv/matchInc")).
+local MNV is bundle(List("trn/transferMinmus","trn/capture", "mnv/custom", "mnv/matchInc", "mnv/execute")).
 
 local mission is import("missionRunner")(
 	List(
@@ -84,7 +84,7 @@ function exec {
 	if not HASNODE mission["prev"]().
 	else {
 		RT["activateAll"]().
-		MNV["execute"]().
+		MNV["execute"](burn["throttle"]).
 		enablePowerSaving().
 		mission["next"]().
 	}
@@ -94,7 +94,7 @@ function matchMinmusInclination {
 	mission["next"]().
 }
 function transferToMinmus {
-	local res is MNV["transferMinmus"](10e3).
+	local res is MNV["transferMinmus"](20000).
 	if res = "wait" {
 		print "waiting for new transfer".
 		wait 10.
@@ -111,27 +111,28 @@ function transferToMinmus {
 	}
 }
 function correctEncounter {
-	local lock incMinmus is SHIP:OBT:nextPatch:inclination.
-	local lock peMinmus is SHIP:OBT:nextPatch:periapsis.
 	// make sure we are in a prograde orbit
-	if incMinmus < 90 and peMinmus > 11000 and peMinmus < 9000 {
+	if SHIP:OBT:nextPatch:inclination < 90 and SHIP:OBT:nextPatch:periapsis > 21000 and SHIP:OBT:nextPatch:periapsis < 19000 {
 		mission["jump"]("waitSoi").
 	}
 	else {
 		local tmp is Node(TIME:seconds + 30, 0, 0, 0).
 		Add tmp.
-		if incMinmus > 90 or peMinmus < 9000 {
-			until incMinmus < 90 and peMinmus > 9000 set tmp:prograde to tmp:prograde - 0.01.
+		local lock incMinmus to tmp:OBT:nextPatch:inclination.
+		local lock peMinmus to tmp:OBT:nextPatch:periapsis.
+		if incMinmus > 90 or peMinmus < 19000 {
+			until incMinmus < 90 and peMinmus > 19000 set tmp:prograde to tmp:prograde - 0.001.
 		}
-		else if peMinmus > 11000 {
-			until peMinmus < 11000 set tmp:prograde to tmp:prograde + 0.01.
+		else if peMinmus > 21000 {
+			until peMinmus < 21000 set tmp:prograde to tmp:prograde + 0.001.
 		}
 		Remove tmp.
-		set burn to MNV["custom"](TIME:seconds + 30, 0, 0, tmp:prograde).
+		set burn to MNV["custom"](TIME:seconds + 30, 0, 0, tmp:prograde, 0.001).
 		mission["next"]().
 	}
 }
 function waitForMinmusSoi {
+	// set an alarm
 	if BODY = Minmus {
 		wait 30.
 		mission["next"]().

@@ -1,9 +1,8 @@
 local safeStage is import("sys/safeStage").
-local execute is import("mnv/execute").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local TRN is bundle(List("trn/transferMun","trn/capture")).
+local MNV is bundle(List("trn/transferMun","trn/capture","mnv/execute")).
 
 local mission is import("missionRunner")(
 	List(
@@ -82,13 +81,13 @@ function exec {
 	if not HASNODE mission["prev"]().
 	else {
 		RT["activateAll"]().
-		execute().
+		MNV["execute"](burn["throttle"]).
 		enablePowerSaving().
 		mission["next"]().
 	}
 }
 function transferToMun {
-	local res is TRN["transferMun"](30000).
+	local res is MNV["transferMun"](30000).
 	if res = "wait" {
 		print "waiting for new transfer".
 		wait 10.
@@ -111,6 +110,6 @@ function waitForMunSoi {
 	}
 }
 function captureAtPe {
-	set burn to TRN["capture"](PERIAPSIS).
+	set burn to MNV["capture"](PERIAPSIS).
 	mission["next"]().
 }

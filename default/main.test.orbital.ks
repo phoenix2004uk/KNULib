@@ -89,7 +89,7 @@ function exec {
 	if not HASNODE mission["prev"]().
 	else {
 		RT["activateAll"]().
-		MNV["execute"]().
+		MNV["execute"](burn["throttle"]).
 		enablePowerSaving().
 		mission["next"]().
 	}
