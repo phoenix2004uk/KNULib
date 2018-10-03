@@ -16,6 +16,8 @@ local mission is import("missionRunner")(
 				matchInc@,		coast@, exec@,
 				circularize@,	coast@, exec@,
 				changeInc0@,	coast@, exec@,
+				tinyCustomBurnT1@,	coast@, exec@,
+				tinyCustomBurnT1em4@,	coast@, exec@,
 				changePe25@,	coast@, exec@,
 "idle",			idleTillCrash@
 	),
@@ -131,10 +133,22 @@ function circularize {
 	mission["next"]().
 }
 function changeInc0 {
+	if BODY <> Kerbin return.
 	set burn to MNV["changeInc"](0,"highest").
 	mission["next"]().
 }
+function tinyCustomBurnT1 {
+	if BODY <> Kerbin return.
+	set burn to MNV["custom"](TIME:seconds + 30, 0, 0, 1).
+	mission["next"]().
+}
+function tinyCustomBurnT1em4 {
+	if BODY <> Kerbin return.
+	set burn to MNV["custom"](TIME:seconds + 30, 0, 0, 1, 1e-3).
+	mission["next"]().
+}
 function changePe25 {
+	if BODY <> Kerbin return.
 	set burn to MNV["changePe"](25000).
 	mission["next"]().
 }

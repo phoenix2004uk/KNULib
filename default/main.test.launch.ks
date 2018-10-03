@@ -44,6 +44,7 @@ function idle {
 	if isFacing(VSL["orient"]()) {
 		unlock STEERING.
 		SAS ON.
+		wait 10.
 		mission["next"]().
 	}
 }

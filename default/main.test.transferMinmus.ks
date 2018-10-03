@@ -2,7 +2,9 @@ local safeStage is import("sys/safeStage").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local MNV is bundle(List("trn/transferMinmus","trn/capture", "mnv/custom", "mnv/matchInc", "mnv/execute")).
+local MNV is bundle(List("trn/transferMinmus","trn/capture", "mnv/custom", "mnv/matchInc", "mnv/changeInc", "mnv/execute")).
+
+local minmusCaptureAltitude is 50000.
 
 local mission is import("missionRunner")(
 	List(
@@ -94,7 +96,7 @@ function matchMinmusInclination {
 	mission["next"]().
 }
 function transferToMinmus {
-	local res is MNV["transferMinmus"](20000).
+	local res is MNV["transferMinmus"](minmusCaptureAltitude).
 	if res = "wait" {
 		print "waiting for new transfer".
 		wait 10.
@@ -112,7 +114,7 @@ function transferToMinmus {
 }
 function correctEncounter {
 	// make sure we are in a prograde orbit
-	if SHIP:OBT:nextPatch:inclination < 90 and SHIP:OBT:nextPatch:periapsis > 21000 and SHIP:OBT:nextPatch:periapsis < 19000 {
+	if SHIP:OBT:nextPatch:inclination < 90 and SHIP:OBT:nextPatch:periapsis > minmusCaptureAltitude+1e3 and SHIP:OBT:nextPatch:periapsis < minmusCaptureAltitude-1e3 {
 		mission["jump"]("waitSoi").
 	}
 	else {
@@ -120,11 +122,11 @@ function correctEncounter {
 		Add tmp.
 		local lock incMinmus to tmp:OBT:nextPatch:inclination.
 		local lock peMinmus to tmp:OBT:nextPatch:periapsis.
-		if incMinmus > 90 or peMinmus < 19000 {
-			until incMinmus < 90 and peMinmus > 19000 set tmp:prograde to tmp:prograde - 0.001.
+		if incMinmus > 90 or peMinmus < minmusCaptureAltitude-1e3 {
+			until incMinmus < 90 and peMinmus > minmusCaptureAltitude-1e3 set tmp:prograde to tmp:prograde - 0.001.
 		}
-		else if peMinmus > 21000 {
-			until peMinmus < 21000 set tmp:prograde to tmp:prograde + 0.001.
+		else if peMinmus > minmusCaptureAltitude+1e3 {
+			until peMinmus < minmusCaptureAltitude+1e3 set tmp:prograde to tmp:prograde + 0.001.
 		}
 		Remove tmp.
 		set burn to MNV["custom"](TIME:seconds + 30, 0, 0, tmp:prograde, 0.001).
@@ -143,6 +145,6 @@ function captureAtPe {
 	mission["next"]().
 }
 function burnEquatorial {
-	set burn to MNV["changeInc"](0).
+	set burn to MNV["changeInc"](0,"next").
 	mission["next"]().
 }
