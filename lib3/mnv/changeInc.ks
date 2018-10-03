@@ -26,7 +26,7 @@
 		if whichNode = "DN" set dvNormal to -dvNormal.
 
 		local halfBurnDuration is maneuverTime(dvTotal / 2, thrustFactor).
-		local fullBurnDuration is maneuverTime(dv, thrustFactor).
+		local fullBurnDuration is maneuverTime(dvTotal, thrustFactor).
 		local nodeTime is TIME:seconds + ORB["eta" + whichNode]().
 		if ORB["eta" + whichNode]() < halfBurnDuration {
 			set nodeTime to nodeTime + SHIP:OBT:period.
