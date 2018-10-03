@@ -36,9 +36,14 @@ function launch {
 function inOrbit {
 	RT["activateAll"]().
 	RT["setTarget"]("Mission Control","RelayAntenna50").
+	mission["enable"]("orientCraft").
 
 	mission["next"]().
 }
 function idle {
-	if isFacing(VSL["orient"]()) mission["next"]().
+	if isFacing(VSL["orient"]()) {
+		unlock STEERING.
+		SAS ON.
+		mission["next"]().
+	}
 }
