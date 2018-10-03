@@ -10,8 +10,8 @@
 
 		local halfBurnDuration is maneuverTime(dv / 2, thrustFactor).
 		local fullBurnDuration is maneuverTime(dv, thrustFactor).
-		local alarm is setAlarm(nodeTime - halfBurnDuration, "custom " + round(newAp/1000,3), margin).
+		local alarm is setAlarm(nodeTime - halfBurnDuration, "custom burn", margin).
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
 	}).
 }

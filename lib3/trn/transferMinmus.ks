@@ -86,6 +86,6 @@
 		local fullBurnDuration is maneuverTime(mnv:prograde, thrustFactor).
 		local alarm is setAlarm(nodeTime - halfBurnDuration, "transferMun " + round(mnv:orbit:nextPatch:periapsis/1000,3), margin).
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
 	}).
 }

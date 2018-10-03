@@ -35,6 +35,6 @@
 		local mnv is NODE(nodeTime, 0, dvNormal, -dvPrograde).
 		ADD mnv.
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
 	}).
 }
