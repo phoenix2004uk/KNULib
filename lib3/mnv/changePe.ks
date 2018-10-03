@@ -2,7 +2,6 @@
 	local VisViva is import("mech/VisViva").
 	local maneuverTime is import("mnv/maneuverTime").
 	local setAlarm is import("util/setAlarm").
-	local exec is import("mnv/execute").
 
 	function calculateDV {
 		parameter newPe.
