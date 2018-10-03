@@ -88,7 +88,7 @@ function exec {
 	}
 }
 function transferToMun {
-	local res is TRN["transferMun"](25000).
+	local res is TRN["transferMun"](30000).
 	if res = "wait" {
 		print "waiting for new transfer".
 		wait 10.

@@ -94,7 +94,7 @@ function matchMinmusInclination {
 	mission["next"]().
 }
 function transferToMinmus {
-	local res is MNV["transferMinmus"](25000).
+	local res is MNV["transferMinmus"](10e3).
 	if res = "wait" {
 		print "waiting for new transfer".
 		wait 10.
@@ -114,17 +114,17 @@ function correctEncounter {
 	local lock incMinmus is SHIP:OBT:nextPatch:inclination.
 	local lock peMinmus is SHIP:OBT:nextPatch:periapsis.
 	// make sure we are in a prograde orbit
-	if incMinmus < 90 and peMinmus > 20000 and peMinmus < 20000 {
+	if incMinmus < 90 and peMinmus > 11000 and peMinmus < 9000 {
 		mission["jump"]("waitSoi").
 	}
 	else {
 		local tmp is Node(TIME:seconds + 30, 0, 0, 0).
 		Add tmp.
-		if incMinmus > 90 or peMinmus < 20000 {
-			until incMinmus < 90 and peMinmus > 20000 set tmp:prograde to tmp:prograde - 0.01.
+		if incMinmus > 90 or peMinmus < 9000 {
+			until incMinmus < 90 and peMinmus > 9000 set tmp:prograde to tmp:prograde - 0.01.
 		}
-		else if peMinmus > 30000 {
-			until peMinmus < 30000 set tmp:prograde to tmp:prograde + 0.01.
+		else if peMinmus > 11000 {
+			until peMinmus < 11000 set tmp:prograde to tmp:prograde + 0.01.
 		}
 		Remove tmp.
 		set burn to MNV["custom"](TIME:seconds + 30, 0, 0, tmp:prograde).
