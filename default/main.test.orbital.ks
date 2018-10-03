@@ -2,14 +2,11 @@ local safeStage is import("sys/safeStage").
 local MNV is bundleDir("mnv").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
-local kerbinLaunch is import("asc/kerbinLaunch").
 local isFacing is import("util/isFacing").
 
 local mission is import("missionRunner")(
 	List(
 "preflight",	preflight@,
-				launch@,
-				inOrbit@,
 "changeAp500",	changeAp500@,	coast@, exec@,
 				changePe500@,	coast@, exec@,
 				checkApsides@,
@@ -65,24 +62,18 @@ function clearAlarms {
 }
 
 function preflight {
+	if STATUS <> "ORBITING" return.
 	if not (SHIP=KUNIVERSE:activeVessel and SHIP:unpacked) return.
 
-	clearFlightpath().
+	until STAGE:number = VSL["stages"]["orbital"] safeStage().
 
-	print "press any key to launch...".
-	TERMINAL:input:getChar().
-
-	mission["next"]().
-}
-function launch {
-	kerbinLaunch(100000, 90).
-	mission["next"]().
-}
-function inOrbit {
 	mission["enable"]("enablePowerSaving").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
 	RT["setTarget"]("Mission Control","RelayAntenna50").
+
+	print "press any key to begin...".
+	TERMINAL:input:getChar().
 
 	mission["next"]().
 }
