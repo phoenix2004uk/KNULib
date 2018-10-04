@@ -27,6 +27,10 @@ function preflight {
 	print "press any key to launch...".
 	TERMINAL:input:getChar().
 
+	// because we don't have a comm network
+	RT["activateAll"]().
+	RT["setTarget"]("Mission Control","RTShortDish2").
+
 	mission["next"]().
 }
 function launch {
@@ -35,16 +39,16 @@ function launch {
 }
 function inOrbit {
 	RT["activateAll"]().
-	RT["setTarget"]("Mission Control","RelayAntenna50").
+	RT["setTarget"]("Mission Control","RTShortDish2").
 	mission["enable"]("orientCraft").
 
 	mission["next"]().
 }
 function idle {
-	if isFacing(VSL["orient"]()) {
-		unlock STEERING.
-		SAS ON.
-		wait 10.
-		mission["next"]().
-	}
+	if not isFacing(VSL["orient"]()) lock STEERING to VSL["orient"]().
+	wait 10.
+	unlock STEERING.
+	SAS ON.
+	wait 10.
+	mission["next"]().
 }

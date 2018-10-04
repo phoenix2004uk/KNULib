@@ -2,41 +2,38 @@ local safeStage is import("sys/safeStage").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local MNV is bundle(List("trn/transferMun","trn/capture","mnv/execute")).
+local MNV is bundle(List("mnv/matchInc","trn/transferMun","trn/capture","mnv/execute")).
 
 local mission is import("missionRunner")(
 	List(
 		preflight@,
-		transferToMun@,	coast@, exec@,
+		matchMunInclination@, exec@,
+		transferToMun@,	exec@,
 		waitForMunSoi@,
-		captureAtPe@, coast@, exec@
+		captureAtPe@, exec@
 	),
 	List(
 		"orientCraft", orientCraft@,
-		"enablePowerSaving", enablePowerSaving@,
-		"disablePowerSaving", disablePowerSaving@
+		"powerMonitor", powerMonitor@
 	),TRUE
 ).
-mission["disable"]("enablePowerSaving").
-mission["disable"]("disablePowerSaving").
+mission["disable"]("powerMonitor").
 mission["disable"]("orientCraft").
 mission["run"]().
 
 function orientCraft {
 	if not isFacing(VSL["orient"]()) lock STEERING to VSL["orient"]().
 }
-function enablePowerSaving {
-	if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
-		RT["deactivateAll"]().
-		mission["disable"]("enablePowerSaving").
-		mission["enable"]("disablePowerSaving").
-	}
-}
-function disablePowerSaving {
+function powerMonitor {
 	if SHIP:ElectricCharge > VSL["EC_POWERSAVE"][1] {
 		RT["activateAll"]().
-		mission["enable"]("enablePowerSaving").
-		mission["disable"]("disablePowerSaving").
+	}
+	else if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
+		RT["deactivateAll"]().
+		if SHIP:ElectricCharge < VSL["EC_CRITICAL"] {
+			clearFlightpath().
+			wait until SHIP:ElectricCharge > VSL["EC_CRITICAL"].
+		}
 	}
 }
 
@@ -44,12 +41,6 @@ function clearFlightpath {
 	until not HASNODE {
 		Remove NEXTNODE.
 		wait 1.
-	}
-	clearAlarms().
-}
-function clearAlarms {
-	for alarm in ListAlarms("All") {
-		DeleteAlarm(alarm:id).
 	}
 }
 
@@ -59,44 +50,43 @@ function preflight {
 
 	until STAGE:number = VSL["stages"]["orbital"] safeStage().
 
-	mission["enable"]("enablePowerSaving").
+	print "press any key to begin...".
+	TERMINAL:input:getChar().
+
+	mission["enable"]("powerMonitor").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
 	RT["setTarget"]("Mission Control","RelayAntenna50").
 
-	print "press any key to begin...".
-	TERMINAL:input:getChar().
-
 	mission["next"]().
 }
-function coast {
-	if not (DEFINED burn) {
+function exec {
+	if not (DEFINED burn and HASNODE) {
 		clearFlightpath().
 		mission["prev"]().
 	}
-	else if burn["node"]:eta - 60 <= burn["preburn"]
-		mission["next"]().
-}
-function exec {
-	if not HASNODE mission["prev"]().
-	else {
+	else if burn["node"]:eta - 60 <= burn["preburn"] {
 		RT["activateAll"]().
 		MNV["execute"](burn["throttle"]).
-		enablePowerSaving().
 		mission["next"]().
 	}
+}
+function matchMunInclination {
+	set burn to MNV["matchInc"](Mun).
+	mission["next"]().
 }
 function transferToMun {
 	local res is MNV["transferMun"](30000).
-	if res = "wait" {
-		print "waiting for new transfer".
+	if res:isType("string") {
+		if res = "wait" {
+			print "waiting for new transfer".
+		}
+		else if res = "missed" {
+			print "we missed".
+			mission["end"]().
+		}
 		wait 10.
 		clearscreen.
-		return.
-	}
-	else if res = "missed" {
-		print "we missed".
-		mission["end"]().
 	}
 	else {
 		set burn to res.

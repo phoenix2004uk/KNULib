@@ -4,62 +4,52 @@ local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
 
+function clearFlightpath {
+	until not HASNODE {
+		Remove NEXTNODE.
+		wait 1.
+	}
+}
+
 local mission is import("missionRunner")(
 	List(
 "preflight",	preflight@,
-"changeAp500",	changeAp500@,	coast@, exec@,
-				changePe500@,	coast@, exec@,
+"changeAp500",	changeAp500@, exec@,
+				changePe500@, exec@,
 				checkApsides@,
-				changeInc10@,	coast@, exec@,
-				ellipticize08@,	coast@, exec@,
+				changeInc10@, exec@,
+				ellipticize08@, exec@,
 "wait",			waitForTarget@,
-				matchInc@,		coast@, exec@,
-				circularize@,	coast@, exec@,
-				changeInc0@,	coast@, exec@,
-				tinyCustomBurnT1@,	coast@, exec@,
-				tinyCustomBurnT1em4@,	coast@, exec@,
-				changePe25@,	coast@, exec@,
+				matchInc@, exec@,
+				circularize@, exec@,
+				changeInc0@, exec@,
+				tinyCustomBurnT1@, exec@,
+				tinyCustomBurnT1em4@, exec@,
+				changePe25@, exec@,
 "idle",			idleTillCrash@
 	),
 	List(
 		"orientCraft", orientCraft@,
-		"enablePowerSaving", enablePowerSaving@,
-		"disablePowerSaving", disablePowerSaving@
+		"powerMonitor", powerMonitor@
 	),TRUE
 ).
-mission["disable"]("enablePowerSaving").
-mission["disable"]("disablePowerSaving").
+mission["disable"]("powerMonitor").
 mission["disable"]("orientCraft").
 mission["run"]().
 
 function orientCraft {
 	if not isFacing(VSL["orient"]()) lock STEERING to VSL["orient"]().
 }
-function enablePowerSaving {
-	if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
-		RT["deactivateAll"]().
-		mission["disable"]("enablePowerSaving").
-		mission["enable"]("disablePowerSaving").
-	}
-}
-function disablePowerSaving {
+function powerMonitor {
 	if SHIP:ElectricCharge > VSL["EC_POWERSAVE"][1] {
 		RT["activateAll"]().
-		mission["enable"]("enablePowerSaving").
-		mission["disable"]("disablePowerSaving").
 	}
-}
-
-function clearFlightpath {
-	until not HASNODE {
-		Remove NEXTNODE.
-		wait 1.
-	}
-	clearAlarms().
-}
-function clearAlarms {
-	for alarm in ListAlarms("All") {
-		DeleteAlarm(alarm:id).
+	else if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
+		RT["deactivateAll"]().
+		if SHIP:ElectricCharge < VSL["EC_CRITICAL"] {
+			clearFlightpath().
+			wait until SHIP:ElectricCharge > VSL["EC_CRITICAL"].
+		}
 	}
 }
 
@@ -69,30 +59,25 @@ function preflight {
 
 	until STAGE:number = VSL["stages"]["orbital"] safeStage().
 
-	mission["enable"]("enablePowerSaving").
-	mission["enable"]("orientCraft").
-	RT["activateAll"]().
-	RT["setTarget"]("Mission Control","RelayAntenna50").
-
 	print "press any key to begin...".
 	TERMINAL:input:getChar().
 
+	RT["activateAll"]().
+	RT["setTarget"]("Mission Control","RelayAntenna50").
+
+	mission["enable"]("powerMonitor").
+	mission["enable"]("orientCraft").
+
 	mission["next"]().
 }
-function coast {
-	if not (DEFINED burn) {
+function exec {
+	if not (DEFINED burn and HASNODE) {
 		clearFlightpath().
 		mission["prev"]().
 	}
-	else if burn["node"]:eta - 60 <= burn["preburn"]
-		mission["next"]().
-}
-function exec {
-	if not HASNODE mission["prev"]().
-	else {
+	else if burn["node"]:eta - 60 <= burn["preburn"] {
 		RT["activateAll"]().
 		MNV["execute"](burn["throttle"]).
-		enablePowerSaving().
 		mission["next"]().
 	}
 }
@@ -154,5 +139,5 @@ function changePe25 {
 }
 function idleTillCrash {
 	mission["disable"]("orientCraft").
-	mission["disable"]("checkPowerSave").
+	mission["disable"]("powerMonitor").
 }

@@ -9,39 +9,35 @@ local minmusCaptureAltitude is 50000.
 local mission is import("missionRunner")(
 	List(
 		preflight@,
-		matchMinmusInclination@, coast@, exec@,
-		transferToMinmus@,	coast@, exec@,
-		correctEncounter@, coast@, exec@,
+		matchMinmusInclination@, exec@,
+		transferToMinmus@, exec@,
+		correctEncounter@, exec@,
 "waitSoi",waitForMinmusSoi@,
-		captureAtPe@, coast@, exec@,
-		burnEquatorial@, coast@, exec@
+		captureAtPe@, exec@,
+		burnEquatorial@, exec@
 	),
 	List(
 		"orientCraft", orientCraft@,
-		"enablePowerSaving", enablePowerSaving@,
-		"disablePowerSaving", disablePowerSaving@
+		"powerMonitor", powerMonitor@
 	),TRUE
 ).
-mission["disable"]("enablePowerSaving").
-mission["disable"]("disablePowerSaving").
+mission["disable"]("powerMonitor").
 mission["disable"]("orientCraft").
 mission["run"]().
 
 function orientCraft {
 	if not isFacing(VSL["orient"]()) lock STEERING to VSL["orient"]().
 }
-function enablePowerSaving {
-	if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
-		RT["deactivateAll"]().
-		mission["disable"]("enablePowerSaving").
-		mission["enable"]("disablePowerSaving").
-	}
-}
-function disablePowerSaving {
+function powerMonitor {
 	if SHIP:ElectricCharge > VSL["EC_POWERSAVE"][1] {
 		RT["activateAll"]().
-		mission["enable"]("enablePowerSaving").
-		mission["disable"]("disablePowerSaving").
+	}
+	else if SHIP:ElectricCharge < VSL["EC_POWERSAVE"][0] {
+		RT["deactivateAll"]().
+		if SHIP:ElectricCharge < VSL["EC_CRITICAL"] {
+			clearFlightpath().
+			wait until SHIP:ElectricCharge > VSL["EC_CRITICAL"].
+		}
 	}
 }
 
@@ -49,12 +45,6 @@ function clearFlightpath {
 	until not HASNODE {
 		Remove NEXTNODE.
 		wait 1.
-	}
-	clearAlarms().
-}
-function clearAlarms {
-	for alarm in ListAlarms("All") {
-		DeleteAlarm(alarm:id).
 	}
 }
 
@@ -64,30 +54,24 @@ function preflight {
 
 	until STAGE:number = VSL["stages"]["orbital"] safeStage().
 
-	mission["enable"]("enablePowerSaving").
+	print "press any key to begin...".
+	TERMINAL:input:getChar().
+
+	mission["enable"]("powerMonitor").
 	mission["enable"]("orientCraft").
 	RT["activateAll"]().
 	RT["setTarget"]("Mission Control","RelayAntenna50").
 
-	print "press any key to begin...".
-	TERMINAL:input:getChar().
-
 	mission["next"]().
 }
-function coast {
-	if not (DEFINED burn) {
+function exec {
+	if not (DEFINED burn and HASNODE) {
 		clearFlightpath().
 		mission["prev"]().
 	}
-	else if burn["node"]:eta - 60 <= burn["preburn"]
-		mission["next"]().
-}
-function exec {
-	if not HASNODE mission["prev"]().
-	else {
+	else if burn["node"]:eta - 60 <= burn["preburn"] {
 		RT["activateAll"]().
 		MNV["execute"](burn["throttle"]).
-		enablePowerSaving().
 		mission["next"]().
 	}
 }
@@ -97,15 +81,19 @@ function matchMinmusInclination {
 }
 function transferToMinmus {
 	local res is MNV["transferMinmus"](minmusCaptureAltitude).
-	if res = "wait" {
-		print "waiting for new transfer".
+	if res:isType("string") {
+		if res = "wait" {
+			print "waiting for new transfer".
+		}
+		else if res = "occluded" {
+			print "Minmus transfer occluded by Mun".
+		}
+		else if res = "missed" {
+			print "we missed".
+			mission["end"]().
+		}
 		wait 10.
 		clearscreen.
-		return.
-	}
-	else if res = "missed" {
-		print "we missed".
-		mission["end"]().
 	}
 	else {
 		set burn to res.
