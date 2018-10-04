@@ -5,10 +5,15 @@ local isFacing is import("util/isFacing").
 local MNV is bundle(List("mnv/execute","dsc/deorbitAtLng","dsc/suicideBurn","dsc/land")).
 local seekFlat is import("util/seekFlat").
 local geoOffsetFromShip is import("util/geoOffsetFromShip").
+local posTranslate is import("rcs/posTranslate").
 
 local mission is import("missionRunner")(
 	List(
-		preflight@
+		preflight@,
+		deorbit@, exec@,
+		suicideBurn@, exec@,
+		seekFlatLandingSlope@,
+		descend@
 	),
 	List(
 		"orientCraft", orientCraft@,
@@ -69,4 +74,27 @@ function exec {
 		MNV["execute"](burn["throttle"]).
 		mission["next"]().
 	}
+}
+function deorbit {
+	local targetLongitude is 0.
+	MNV["deorbitAtLng"](targetLongitude).
+}
+function suicideBurn {
+	local altitudeMargin is 100.	// default = 100
+	MNV["suicideBurn"](altitudeMargin).
+}
+function seekFlatLandingSlope {
+	local maxSlope is 5.	// default = 5
+	local stepSize is 5.	// default = 5
+	// TODO: need a way to ABORT back into orbit if this process takes too long
+	// should maybe refactor seekFlat to be called repeatedly instead of internally using an until loop
+	// seekFlat should return List(x,y,slopeAngle), then we can say - if offsetSlope < maxSlope
+	// just need to store the x,y values somewhere during each call of this mission step - means using globals :(
+	local offset is seekFlat(maxSlope, stepSize).
+	posTranslate(geoOffsetFromShip(offset[0], offset[1])).
+	mission["next"]().
+}
+function descend {
+	MNV["land"]().
+	mission["next"]().
 }
