@@ -6,6 +6,7 @@
 	export(Lex(
 		"normal", NORMALVEC@,
 		"radial", RADIALVEC@,
+		"pro", { return PROGRADE + R(0,0,0). },
 		"sun", RelativeSunVector@
 	)).
 }
