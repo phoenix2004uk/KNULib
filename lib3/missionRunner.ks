@@ -32,6 +32,14 @@
 
 	local indexOf is import("util/indexOf").
 
+	function runEvents {
+		parameter runner, noarg, mission.
+		for key in runner["evt"]:keys if runner["irq"]:contains(key) {
+			local event is runner["evt"][key].
+			if noarg event(). else event(mission).
+		}
+	}
+
 	function missionRunner_run {
 		parameter runner, noarg.
 
@@ -50,16 +58,16 @@
 			"end",		missionRunner_end@:bind(runner)
 		).
 
+		// if resuming from a saved state, run the events before resuming the mission sequence
+		if runner["step"] <> 0 runEvents(runner, noarg, mission).
+
 		until runner["step"] = runner["seq"]:length {
 			// print runner["step"] + " / " + runner["seq"]:length at (0,0).
 			local step is runner["seq"][runner["step"]].
 			if noarg step(). else step(mission).
 			wait 0.
 
-			for key in runner["evt"]:keys if runner["irq"]:contains(key) {
-				local event is runner["evt"][key].
-				if noarg event(). else event(mission).
-			}
+			runEvents(runner, noarg, mission).
 			wait 0.
 		}
 
