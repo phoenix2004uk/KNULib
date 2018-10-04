@@ -15,6 +15,7 @@
 		lock STEERING to descentVector().
 		wait until SHIP:verticalSpeed < 0.
 
+		// TODO: Enhancement - currently this causes the engine to splutter on and off during suicide burn, TTI needs adjusting slightly because of local gravity
 		until ALT:RADAR <= altitudeMargin {
 			if SHIP:verticalSpeed < 0 and TTI(altitudeMargin) <= maneuverTime(SHIP:velocity:surface:mag) lock THROTTLE to 1.
 			else lock THROTTLE to 0.
