@@ -2,7 +2,7 @@ local safeStage is import("sys/safeStage").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local MNV is bundle(List("mnv/execute","dsc/deorbitAtLng","dsc/suicideBurn","dsc/land")).
+local MNV is bundle(List("mnv/execute","dsc/deorbitAtLng","dsc/suicideBurn","dsc/land","mnv/lowerPe","mnv/circularize")).
 local seekFlat is import("util/seekFlat").
 local geoOffsetFromShip is import("util/geoOffsetFromShip").
 local posTranslate is import("rcs/posTranslate").
@@ -10,6 +10,8 @@ local posTranslate is import("rcs/posTranslate").
 local mission is import("missionRunner")(
 	List(
 		preflight@,
+		lowerOrbit@, exec@,
+		circularizeOrbit@, exec@,
 		deorbit@, exec@,
 		suicideBurn@, exec@,
 		seekFlatLandingSlope@,
@@ -62,6 +64,14 @@ function preflight {
 	RT["activateAll"]().
 	RT["setTarget"]("Mission Control","RelayAntenna50").
 
+	mission["next"]().
+}
+function lowerOrbit {
+	MNV["lowerPe"](10000).
+	mission["next"]().
+}
+function circularizeOrbit {
+	MNV["circularize"]("Pe").
 	mission["next"]().
 }
 function exec {
