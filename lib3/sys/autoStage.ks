@@ -6,11 +6,10 @@
 		local throt is THROTTLE.
 		lock THROTTLE to 0.
 		wait 0.1.
-		until not L["burnout"]() or STAGE:number = stageLimit {
+		L["safeStage"]().
+		until SHIP:availableThrust > 0 or STAGE:number = stageLimit {
 			L["safeStage"]().
-			wait 0.1.
 		}
-		wait 0.5.
 		lock THROTTLE to throt.
 		return TRUE.
 	}).
