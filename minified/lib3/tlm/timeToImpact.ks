@@ -1,0 +1,1 @@
+export({parameter A.local B is BODY:MU/(BODY:RADIUS+ALTITUDE)^2.return (SQRT(VERTICALSPEED^2+2*B*Max(0,ALT:RADAR-A))+VERTICALSPEED)/B.}).

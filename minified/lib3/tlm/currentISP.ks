@@ -1,0 +1,1 @@
+export({LIST ENGINES in A.local B is 0.local D is 0.for F in A if F:ignition and not F:flameout{local f is F:availableThrust. set B to B+f. set D to D+f/F:isp.}if D=0 return 0.return B/D.}).
