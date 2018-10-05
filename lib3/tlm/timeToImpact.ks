@@ -1,10 +1,10 @@
 export({
-	PARAMETER altitudeMargin.
+	parameter altitudeMargin.
 
 	// assume g is g0{body}
-	LOCAL g0 IS BODY:MU / (BODY:RADIUS+ALTITUDE)^2.
-	LOCAL u IS SHIP:VERTICALSPEED.
-	LOCAL d IS Max(0,ALT:RADAR - altitudeMargin).
+	local g0 is BODY:MU / (BODY:RADIUS+ALTITUDE)^2.
+	local u is SHIP:VERTICALSPEED.
+	local d is Max(0,ALT:RADAR - altitudeMargin).
 
 	// d = u * t + 1/2*g*t^2
 	// (g/2)t^2 + (u)t - d =0
@@ -17,5 +17,5 @@ export({
 
 	// WHEN TTI <= MNV_TIME(SHIP:VERTICALSPEED) BURN AT FULL THROTTLE
 
-	RETURN (SQRT(u^2 + 2*g0*d) + u) / g0.
+	return (SQRT(u^2 + 2*g0*d) + u) / g0.
 }).
