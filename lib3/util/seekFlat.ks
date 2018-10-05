@@ -1,6 +1,4 @@
 {
-	local geoOffsetFromShip is import("util/geoOffsetFromShip").
-	local positionOffsetFromShip is import("util/positionOffsetFromShip").
 	local getSlopeAtOffset is import("util/getSlopeAtOffset").
 
 	export({
