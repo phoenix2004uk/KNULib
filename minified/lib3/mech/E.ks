@@ -1,0 +1,1 @@
+export({parameter A.local B is OBT:eccentricity. local D is ARCCOS((B+COS(A))/(1+B*COS(A))).if A>180 return 360-D. return D.}).

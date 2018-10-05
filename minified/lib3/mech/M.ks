@@ -1,0 +1,1 @@
+export({parameter A.return A-OBT:eccentricity*SIN(A)*CONSTANT:RadToDeg.}).

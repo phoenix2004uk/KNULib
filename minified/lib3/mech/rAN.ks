@@ -1,0 +1,1 @@
+{local Z is import("mech/rV").local X is import("mech/Van").export({return Z(X()).}).}
