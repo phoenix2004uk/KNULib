@@ -12,7 +12,7 @@
 		local isRetrogradeOrbit is SHIP:OBT:inc > 90.
 
 		local currentLng is SHIP:longitude.
-		local n is 360  / SHIP:OBT:period.
+		local n is 360 / SHIP:OBT:period.
 		local siderealRate is 360 / BODY:rotationPeriod.
 		local shipLngPerSec is n * cos(SHIP:OBT:inclination).
 		// if we are orbiting retrograde, siderealRate works in our favour
@@ -22,10 +22,7 @@
 		// otherwise it works against us
 		else set shipLngPerSec to shipLngPerSec - siderealRate.
 
-
-		if geoCoords:lat = 0 {
-			return "equatorial".
-		}
+		if geoCoords:lat = 0 return "equatorial".
 
 		local targetSurfaceLan is degmod(geoCoords:lng - 90).
 		local deltaLng is targetSurfaceLan - currentLng.
