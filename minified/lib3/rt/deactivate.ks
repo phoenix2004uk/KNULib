@@ -1,0 +1,1 @@
+export({parameter A,B is 0.local D is SHIP:partsNamed(A).if D:length>B{local F is D[B]:getModule("ModuleRTAntenna").if F:hasAction("deactivate")F:doAction("deactivate",FALSE).}}).

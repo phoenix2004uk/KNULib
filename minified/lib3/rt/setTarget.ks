@@ -1,0 +1,1 @@
+export({parameter A,B,D is 0.local F is SHIP:partsNamed(B).if F:length>D{local H is F[D]:getModule("ModuleRTAntenna").H:setField("target",A).}}).

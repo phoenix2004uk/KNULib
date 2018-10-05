@@ -1,0 +1,1 @@
+export({for A in SHIP:modulesNamed("ModuleRTAntenna")if A:hasEvent("activate")A:doEvent("activate").}).
