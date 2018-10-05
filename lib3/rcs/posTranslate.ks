@@ -5,7 +5,7 @@
 	local vectorTranslate is import("rcs/vectorTranslate").
 	local hoverThrust is import("sys/hoverThrust").
 
-	// TODO: Optimize - change altPos to constant height above terrain
+	// TODO: TEST vessel descends while translating, down to minmum of altitudeTarget above terrain
 	export({
 		parameter geoPos, howClose is 5.
 
