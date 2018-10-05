@@ -29,7 +29,7 @@
 	export({
 		parameter targetPe, thrustFactor is 1, margin is 60.
 
-		// TODO: Enhancement - correct relative inclination if possible
+		// TODO: Enhancement - correct relative inclination if possible - or we could return a string error message if the orbits are not aligned?
 		// currently will be required to correct inclination first
 
 		local dv is calculateDV(Minmus:altitude - Minmus:soiRadius).
