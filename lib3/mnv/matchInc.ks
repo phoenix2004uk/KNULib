@@ -6,21 +6,26 @@
 	local TRN is bundle(List("trn/relativeInclination","trn/relativeNodes")).
 	local ORD is import("ord").
 
-	// TODO: handle eta < halfBurnDuration for whichNode = next
-	export({
+	function calculateDeltaV {
 		parameter targetOrbitable, whichNode is "highest", thrustFactor is 1, margin is 60.
+
+		local useNextNode is whichNode = "next".
+		local useHighestNode is whichNode = "highest".
 
 		local nodes is TRN["relativeNodes"](targetOrbitable).
 		local rAN is ORB["rV"](nodes["AN"]).
 		local rDN is ORB["rV"](nodes["DN"]).
 
-		if whichNode = "highest" {
+		if useHighestNode {
 			if rAN > rDN set whichNode to "AN".
 			else set whichNode to "DN".
 		}
-		else if whichNode = "next" {
+		else if useNextNode {
 			set whichNode to nodes["next"].
 		}
+		// otherNode set so we can switch node if we have passed "next" node
+		local otherNode is "AN".
+		if whichNode = "AN" set otherNode to "DN".
 
 		local theta is TRN["relativeInclination"](targetOrbitable).
 		local nodeTime is TIME:seconds + ORB["etaV"](nodes[whichNode]).
@@ -42,12 +47,24 @@
 		local halfBurnDuration is maneuverTime(deltaV:mag / 2, thrustFactor).
 		local fullBurnDuration is maneuverTime(deltaV:mag, thrustFactor).
 		if ORB["etaV"](nodes[whichNode]) < halfBurnDuration {
-			set nodeTime to nodeTime + SHIP:OBT:period.
+			if useNextNode {
+				// recalculate using otherNode
+				return calculateDeltaV(targetOrbitable, otherNode, thrustFactor, margin).
+			}
+			else {
+				set nodeTime to nodeTime + SHIP:OBT:period.
+			}
 		}
 		local alarm is setAlarm(nodeTime - halfBurnDuration, "matchInc " + targetOrbitable:name, margin).
 		local mnv is NODE(nodeTime, dvRad, dvNrm, dvPro).
 		ADD mnv.
 
 		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
+	}
+
+	export({
+		parameter targetOrbitable, whichNode is "highest", thrustFactor is 1, margin is 60.
+
+		return calculateDeltaV(targetOrbitable, whichNode, thrustFactor, margin).
 	}).
 }

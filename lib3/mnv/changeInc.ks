@@ -4,18 +4,23 @@
 	local setAlarm is import("util/setAlarm").
 	local ORB is bundle(List("mech/rAN","mech/rDN","mech/etaAN","mech/etaDN")).
 
-	// TODO: handle eta < halfBurnDuration for whichNode = next
 	export({
 		parameter newInc, whichNode is "highest", thrustFactor is 1, margin is 60.
 
-		if whichNode = "next" {
+		local useNextNode is whichNode = "next".
+		local useHighestNode is whichNode = "highest".
+
+		if useNextNode {
 			if ORB["etaAN"]() < ORB["etaDN"]() set whichNode to "AN".
 			else set whichNode to "DN".
 		}
-		else if whichNode = "highest" {
+		else if useHighestNode {
 			if ORB["rAN"]() > ORB["rDN"]() set whichNode to "AN".
 			else set whichNode to "DN".
 		}
+		// otherNode set so we can switch node if we have passed "next" node
+		local otherNode is "AN".
+		if whichNode = "AN" set otherNode to "DN".
 
 		local theta is newInc - SHIP:OBT:inclination.
 
@@ -29,7 +34,15 @@
 		local fullBurnDuration is maneuverTime(dvTotal, thrustFactor).
 		local nodeTime is TIME:seconds + ORB["eta" + whichNode]().
 		if ORB["eta" + whichNode]() < halfBurnDuration {
-			set nodeTime to nodeTime + SHIP:OBT:period.
+			if useNextNode {
+				// use other node
+				set nodeTime to TIME:seconds + ORB["eta" + otherNode]().
+				// flip normal dv
+				set dvNormal to -dvNormal.
+			}
+			else {
+				set nodeTime to nodeTime + SHIP:OBT:period.
+			}
 		}
 		local alarm is setAlarm(nodeTime - halfBurnDuration, "changeInc " + round(theta,1), margin).
 		local mnv is NODE(nodeTime, 0, dvNormal, -dvPrograde).
