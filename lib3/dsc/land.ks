@@ -3,6 +3,7 @@
 	local killTranslate is import("rcs/killTranslate").
 	local translateOff is import("rcs/translateOff").
 	local suicideBurn is import("dsc/suicideBurn").
+	local getSlopeAtOffset is import("util/getSlopeAtOffset").
 
 	export({
 		parameter suicideAltitude is 5.
@@ -21,7 +22,9 @@
 
 
 		lock THROTTLE to 0.
-		unlock STEERING.
-		//TODO: lock STEERING to LOOKDIRUP(getSlopeAtOffset(0,0),SUN:position)
+		wait 1.
+		//TODO: TEST landing orientation works
+		lock STEERING to LOOKDIRUP(getSlopeAtOffset(0,0),SUN:position).
+		wait 5.
 	}).
 }
