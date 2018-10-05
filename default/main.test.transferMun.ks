@@ -2,7 +2,7 @@ local safeStage is import("sys/safeStage").
 local RT is bundleDir("rt").
 local VSL is import("vessel").
 local isFacing is import("util/isFacing").
-local MNV is bundle(List("mnv/matchInc","trn/transferMun","trn/capture","mnv/execute")).
+local MNV is bundle(List("mnv/matchInc","trn/transferMun","trn/capture","mnv/changeInc","mnv/execute")).
 
 local mission is import("missionRunner")(
 	List(
@@ -10,7 +10,8 @@ local mission is import("missionRunner")(
 		matchMunInclination@, exec@,
 		transferToMun@,	exec@,
 		waitForMunSoi@,
-		captureAtPe@, exec@
+		captureAtPe@, exec@,
+		burnEquatorial@, exec@
 	),
 	List(
 		"orientCraft", orientCraft@,
@@ -101,5 +102,9 @@ function waitForMunSoi {
 }
 function captureAtPe {
 	set burn to MNV["capture"](PERIAPSIS).
+	mission["next"]().
+}
+function burnEquatorial {
+	set burn to MNV["changeInc"](0,"next").
 	mission["next"]().
 }
