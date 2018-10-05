@@ -2,8 +2,7 @@
 	local ORD is import("ord").
 	export(Lex(
 
-		// TODO: don't want to use this
-		// launchProfile, Lex()			// [optional]
+		// launchProfile, Lex()			// [optional] used to over-write launchProfile parameters
 
 		"stages", Lex(					// [required] information about staging, used during launch and landing
 			"lastAscent", 2,			// [required] last stage that can be used during launch
