@@ -62,6 +62,7 @@
 		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
 	}
 
+	// TODO: TEST eta < halfBurnDuration for whichNode = next
 	export({
 		parameter targetOrbitable, whichNode is "highest", thrustFactor is 1, margin is 60.
 

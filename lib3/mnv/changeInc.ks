@@ -4,6 +4,7 @@
 	local setAlarm is import("util/setAlarm").
 	local ORB is bundle(List("mech/rAN","mech/rDN","mech/etaAN","mech/etaDN")).
 
+	// TODO: TEST eta < halfBurnDuration for whichNode = next
 	export({
 		parameter newInc, whichNode is "highest", thrustFactor is 1, margin is 60.
 
