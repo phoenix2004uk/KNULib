@@ -1,4 +1,5 @@
 {
-	local mech is bundle(List("mech/etaV","mech/Vdn")).
-	export({ return mech["etaV"](mech["Vdn"]()). }).
+	local etaV is import("mech/etaV").
+	local Vdn is import("mech/Vdn").
+	export({ return etaV(Vdn()). }).
 }
