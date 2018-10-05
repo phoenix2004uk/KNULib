@@ -31,6 +31,7 @@
 {
 
 	local indexOf is import("util/indexOf").
+	local RUNMODE_BASE_PATH is "1:/etc/run.".
 
 	function runEvents {
 		parameter runner, noarg, mission.
@@ -75,7 +76,7 @@
 	}
 	function missionRunner_cleanup {
 		parameter runner.
-		DeletePath("1:/etc/run."+runner["tag"]).
+		DeletePath(RUNMODE_BASE_PATH + runner["tag"]).
 	}
 
 	function encode_state {
@@ -95,15 +96,15 @@
 
 	function missionRunner_loadState {
 		parameter runner.
-		if Exists("1:/etc/run."+runner["tag"]) {
-			decode_state(Open("1:/etc/run."+runner["tag"]):readAll:string, runner).
+		if Exists(RUNMODE_BASE_PATH + runner["tag"]) {
+			decode_state(Open(RUNMODE_BASE_PATH + runner["tag"]):readAll:string, runner).
 		}
 	}
 	function missionRunner_saveState {
 		parameter runner.
 		if not runner["running"] return.
-		DeletePath("1:/etc/run."+runner["tag"]).
-		Create("1:/etc/run."+runner["tag"]):write(encode_state(runner)).
+		DeletePath(RUNMODE_BASE_PATH + runner["tag"]).
+		Create(RUNMODE_BASE_PATH + runner["tag"]):write(encode_state(runner)).
 	}
 
 	function missionRunner_enable {
