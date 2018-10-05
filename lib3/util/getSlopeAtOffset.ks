@@ -1,5 +1,5 @@
 {
-	local positionOffsetFromShip is import().
+	local positionOffsetFromShip is import("util/positionOffsetFromShip").
 	export({
 		parameter x, y.
 		local j is positionOffsetFromShip(x+5,y).
