@@ -17,19 +17,18 @@
 		local etaToLng is deltaLng / lngPerSec.
 		local nodeTime is TIME:seconds + etaToLng.
 
-		local srfSpeed is 2*CONSTANT:PI*BODY:radius / siderealRate.
-		local dv is srfSpeed - velocityAt(SHIP, nodeTime):mag.
+		//local srfSpeed is 2*CONSTANT:PI*BODY:radius / siderealRate.
+		local dv is velocityAt(SHIP, nodeTime):surface:mag.
 
-
-		local halfBurnDuration is maneuverTime(dv / 2, thrustFactor).
-		local fullBurnDuration is maneuverTime(dv, thrustFactor).
+		local halfBurnDuration is maneuverTime(dv / 2).
+		local fullBurnDuration is maneuverTime(dv).
 		if etaToLng < halfBurnDuration {
 			set nodeTime to nodeTime + 360 / lngPerSec.
 		}
 		local alarm is setAlarm(nodeTime - halfBurnDuration, "begin descent " + round(targetLng,2), margin).
-		local mnv is NODE(nodeTime, 0, 0, dv).
+		local mnv is NODE(nodeTime, 0, 0, -dv).
 		ADD mnv.
 
-		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",thrustFactor).
+		return Lex("node",mnv,"preburn",halfBurnDuration,"fullburn",fullBurnDuration,"alarm",alarm,"throttle",1).
 	}).
 }

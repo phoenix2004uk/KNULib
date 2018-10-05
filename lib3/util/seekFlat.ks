@@ -14,7 +14,7 @@
 		return VCRS(l - j, k - j).
 	}
 	export({
-		parameter maxSlope is 5, step is 5.
+		parameter maxSlope is 5.
 
 		local x is 0.
 		local y is 0.
@@ -24,6 +24,7 @@
 			local groundNormal is getSlopeAtOffset(x,y).
 			set slopeAngle to VANG(groundNormal, UP:vector).
 			if slopeAngle < maxSlope break.
+			set step to max(1,min(20, slopeAngle - maxSlope)).
 
 			local downhill is VXCL(UP:vector, groundNormal).
 			set x to x + step * COS(VANG(downhill, NORTH:vector)).

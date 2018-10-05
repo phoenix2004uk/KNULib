@@ -3,8 +3,9 @@
 	local vectorTranslate is import("rcs/vectorTranslate").
 
 	export({
-		until GROUNDSPEED < 0.05 {
-			vectorTranslate(srfRetrograde:vector, GROUNDSPEED).
+		local lock horizontalSpeed to SQRT(abs(GROUNDSPEED^2 - VERTICALSPEED^2)).
+		until horizontalSpeed < 0.1 {
+			vectorTranslate(srfRetrograde:vector, horizontalSpeed).
 			wait 0.
 		}
 		translateOff().
