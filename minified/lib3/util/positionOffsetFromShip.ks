@@ -1,0 +1,1 @@
+{local Z is import("util/geoOffsetFromShip").export({parameter A,B.local D is Z(A,B).return D:altitudePosition(D:terrainHeight).}).}

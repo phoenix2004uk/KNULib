@@ -1,0 +1,1 @@
+{local Z is import("util/positionOffsetFromShip").export({parameter A,B.local D is Z(A+5,B).return VCRS(Z(A-3,B-4)-D,Z(A-3,B+4)-D).}).}

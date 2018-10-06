@@ -1,0 +1,1 @@
+export({parameter A.if A:isType("Direction")set A to A:vector.return VANG(FACING:vector,A)<1.}).

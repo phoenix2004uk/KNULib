@@ -1,0 +1,1 @@
+export({parameter A,B,D is 60.if D>0 AddAlarm("Raw",A-D,"margin","").return AddAlarm("Raw",A,B,"").}).

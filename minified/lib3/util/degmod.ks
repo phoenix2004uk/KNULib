@@ -1,0 +1,1 @@
+export({parameter A.if A<0 until A>=0 set A to A+360.return mod(A,360).}).

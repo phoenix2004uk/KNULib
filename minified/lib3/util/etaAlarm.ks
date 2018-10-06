@@ -1,0 +1,1 @@
+export({parameter A.for B in ListAlarms("All")if B:name=A return B:remaining. return -1.}).
