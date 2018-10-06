@@ -1,1 +1,1 @@
-export({parameter A,B,D is BODY.return SQRT(D:mu*(2/(B+D:radius)-1/A)).}).
+export({parameter A,B,D is BODY. return SQRT(D:mu*(2/(B+D:radius)-1/A)).}).

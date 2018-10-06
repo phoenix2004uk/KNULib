@@ -1,1 +1,1 @@
-export({parameter A,B.local D is 0.until D=A:length if A[D]=B return D.else set D to D+1.return -1.}).
+export({parameter A,B.local D is 0.until D=A:length if A[D]=B return D. else set D to D+1.return -1.}).
