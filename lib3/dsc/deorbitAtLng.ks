@@ -7,7 +7,7 @@
 	export({
 		parameter targetLng, margin is 60.
 
-		local isRetrogradeOrbit is SHIP:OBT:inc > 90.
+		local isRetrogradeOrbit is SHIP:OBT:inclination > 90.
 
 		local currentLng is SHIP:longitude.
 		local n is 360 / SHIP:OBT:period.

@@ -96,12 +96,12 @@
 				}
 			}
 			missionRunner_saveState().
-			if runner[RUNNER_STEP] <> 0 runEvents(runner, noarg, mission).
+			if runner[RUNNER_STEP] <> 0 runEvents().
 			until runner[RUNNER_STEP] = runner[RUNNER_SEQ]:length {
 				local step is runner[RUNNER_SEQ][runner[RUNNER_STEP]].
 				if noarg step(). else step(mission).
 				wait 0.
-				runEvents(runner, noarg, mission).
+				runEvents().
 				wait 0.
 			}
 			DeletePath(RUNMODE_BASE_PATH+runner[RUNNER_TAG]).
