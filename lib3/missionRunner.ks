@@ -88,9 +88,10 @@
 		local data is state:split(",").
 		set runner["step"] to data[0]:toNumber(0).
 		set runner["irq"] to List().
-		if state:endsWith(",") return.
-		for irq in data:subList(1,data:length) {
-			runner["irq"]:add(irq).
+		if not state:endsWith(",") {
+			for irq in data:subList(1,data:length) {
+				runner["irq"]:add(irq).
+			}
 		}
 	}
 
@@ -102,9 +103,10 @@
 	}
 	function missionRunner_saveState {
 		parameter runner.
-		if not runner["running"] return.
-		DeletePath(RUNMODE_BASE_PATH + runner["tag"]).
-		Create(RUNMODE_BASE_PATH + runner["tag"]):write(encode_state(runner)).
+		if runner["running"] {
+			DeletePath(RUNMODE_BASE_PATH + runner["tag"]).
+			Create(RUNMODE_BASE_PATH + runner["tag"]):write(encode_state(runner)).
+		}
 	}
 
 	function missionRunner_enable {

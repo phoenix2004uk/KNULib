@@ -35,9 +35,10 @@
 			set index to index + 1.
 		}
 		local missionRunner_saveState is {
-			if not runner[RUNNER_RUNNING] return.
-			DeletePath(RUNMODE_BASE_PATH+runner[RUNNER_TAG]).
-			Create(RUNMODE_BASE_PATH+runner[RUNNER_TAG]):write(runner[RUNNER_STEP]+","+runner[RUNNER_IRQ]:join(",")).
+			if runner[RUNNER_RUNNING] {
+				DeletePath(RUNMODE_BASE_PATH+runner[RUNNER_TAG]).
+				Create(RUNMODE_BASE_PATH+runner[RUNNER_TAG]):write(runner[RUNNER_STEP]+","+runner[RUNNER_IRQ]:join(",")).
+			}
 		}.
 		local missionRunner_end is {
 			set runner[RUNNER_STEP] to runner[RUNNER_SEQ]:length.
@@ -90,8 +91,9 @@
 				local data is state:split(",").
 				set runner[RUNNER_STEP] to data[0]:toNumber(0).
 				set runner[RUNNER_IRQ] to List().
-				if state:endsWith(",") return.
-				for irq in data:subList(1,data:length) runner[RUNNER_IRQ]:add(irq).
+				if not state:endsWith(",") {
+					for irq in data:subList(1,data:length) runner[RUNNER_IRQ]:add(irq).
+				}
 			}
 			missionRunner_saveState().
 			if runner[RUNNER_STEP] <> 0 runEvents(runner, noarg, mission).
