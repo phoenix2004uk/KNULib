@@ -2,6 +2,7 @@
 	local VSL is import("vessel").
 	local SYS is bundle(List("sys/constantTWR","sys/burnout","sys/autoStage","sys/safeStage")).
 	local MNV is bundle(List("mnv/changePe","mnv/circularize","mnv/execute")).
+	local setAlarm is import("util/setAlarm").
 
 //	function ratioPitchTarget {
 //		parameter launchProfile.
@@ -96,7 +97,6 @@
 			until APOAPSIS >= targetAltitude {
 				if SYS["autoStage"](VSL["stages"]["lastAscent"]).
 					lock THROTTLE to ascentThrottle(). // SYS["constantTWR"](twr).
-				wait 0.
 			}
 			lock THROTTLE to 0.
 
@@ -118,6 +118,7 @@
 			// fudge the burn time so we end the burn before apoapsis with some extra spare time (5 seconds?)
 			set burn["node"]:eta to ETA:apoapsis - (burn["fullburn"] + 5).
 			DeleteAlarm(burn["alarm"]:ID).
+			setAlarm(TIME:seconds+burn["node"]:eta, "insertion", 0).
 
 			// execute insertion burn
 			MNV["execute"]().
