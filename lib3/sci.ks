@@ -37,9 +37,9 @@
 				return ER_INOPERABLE.
 			}
 			module:deploy.
-			local t is TIME:seconds.
+			local startTime is TIME:seconds.
 			until module:hasData {
-				if TIME:seconds-t > EXPERIMENT_WAIT_TIME {
+				if TIME:seconds-startTime > EXPERIMENT_WAIT_TIME {
 					return ER_TIMED_OUT.
 				}
 			}
@@ -88,19 +88,19 @@
 	local transmitExperiments is Lex().
 
 	for ex in standardExperiments {
-		SET runExperiments[ex] to runExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE):bind(FALSE).
-		SET transmitExperiments[ex] to transmitExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE).
-		SET resetExperiments[ex] to resetExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE).
+		set runExperiments[ex] to runExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE):bind(FALSE).
+		set transmitExperiments[ex] to transmitExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE).
+		set resetExperiments[ex] to resetExperiment@:bind(ex):bind(SQUAD_SCIENCE_MODULE).
 	}
 
 	for ex in dmExperiments {
-		SET runExperiments[ex] to runExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE):bind(TRUE).
-		SET transmitExperiments[ex] to transmitExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE).
-		SET resetExperiments[ex] to resetExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE).
+		set runExperiments[ex] to runExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE):bind(TRUE).
+		set transmitExperiments[ex] to transmitExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE).
+		set resetExperiments[ex] to resetExperiment@:bind(ex):bind(DMAGIC_SCIENCE_MODULE).
 	}
 
 	for ex in runExperiments:KEYS {
-		SET runExperiments[ex] to runExperiments[ex]:bind(surfaceExperiments:CONTAINS(ex)).
+		set runExperiments[ex] to runExperiments[ex]:bind(surfaceExperiments:CONTAINS(ex)).
 	}
 
 	export(Lex(

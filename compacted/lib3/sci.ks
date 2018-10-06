@@ -23,8 +23,8 @@
 			if module:hasData return ER_HAS_DATA.
 			if module:inoperable return ER_INOPERABLE.
 			module:deploy.
-			local t is TIME:seconds.
-			until module:hasData if TIME:seconds-t > EXPERIMENT_WAIT_TIME return ER_TIMED_OUT.
+			local startTime is TIME:seconds.
+			until module:hasData if TIME:seconds-startTime > EXPERIMENT_WAIT_TIME return ER_TIMED_OUT.
 			if doToggle module:toggle.
 			if doTransmit {
 				if not HomeConnection:isConnected return ER_NO_CONNECTION.
@@ -62,14 +62,14 @@
 	local transmitExperiments is Lex().
 	local surfaceExperiments is List("sensorAccelerometer").
 	for ex in List("sensorThermometer","sensorBarometer","sensorAccelerometer","sensorGravimeter","sensorAtmosphere","science.module","GooExperiment") {
-		SET runExperiments[ex] to runExperiment@:bind(ex, SQUAD_SCIENCE_MODULE, 0, surfaceExperiments:CONTAINS(ex)).
-		SET transmitExperiments[ex] to transmitExperiment@:bind(ex, SQUAD_SCIENCE_MODULE).
-		SET resetExperiments[ex] to resetExperiment@:bind(ex, SQUAD_SCIENCE_MODULE).
+		set runExperiments[ex] to runExperiment@:bind(ex, SQUAD_SCIENCE_MODULE, 0, surfaceExperiments:CONTAINS(ex)).
+		set transmitExperiments[ex] to transmitExperiment@:bind(ex, SQUAD_SCIENCE_MODULE).
+		set resetExperiments[ex] to resetExperiment@:bind(ex, SQUAD_SCIENCE_MODULE).
 	}
 	for ex in List("dmmagBoom","rpwsAnt") {
-		SET runExperiments[ex] to runExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE, 1, surfaceExperiments:CONTAINS(ex)).
-		SET transmitExperiments[ex] to transmitExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE).
-		SET resetExperiments[ex] to resetExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE).
+		set runExperiments[ex] to runExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE, 1, surfaceExperiments:CONTAINS(ex)).
+		set transmitExperiments[ex] to transmitExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE).
+		set resetExperiments[ex] to resetExperiment@:bind(ex, DMAGIC_SCIENCE_MODULE).
 	}
 	export(Lex(
 		"run", runExperiments,
