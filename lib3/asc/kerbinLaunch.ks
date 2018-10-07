@@ -73,7 +73,7 @@
 		parameter targetAltitude is 100000, launchHeading is 90.
 
 		if STATUS = "PRELAUNCH" {
-			local launchProfile is defaultProfile:copy.
+			local launchProfile is defaultProfile.
 			if VSL:hasKey("launchProfile") {
 				for key in VSL["launchProfile"]:keys {
 					set launchProfile[key] to VSL["launchProfile"][key].
@@ -95,20 +95,20 @@
 
 			// normal ascent
 			until APOAPSIS >= targetAltitude {
-				if SYS["autoStage"](VSL["stages"]["lastAscent"]).
+				if SYS["autoStage"](VSL["stages"]["lastAscent"])
 					lock THROTTLE to ascentThrottle(). // SYS["constantTWR"](twr).
 			}
 			lock THROTTLE to 0.
-
-			// drop ascent stage (if any)
-			until STAGE:number = VSL["stages"]["insertion"]
-				SYS["SafeStage"]().
-
-			// coast to edge of atmosphere
-			wait until ALTITUDE > BODY:ATM:height.
 		}
 
+		// drop ascent stage (if any)
+		until STAGE:number = VSL["stages"]["insertion"]
+			SYS["SafeStage"]().
+
 		if PERIAPSIS < 10000 {
+			// coast to edge of atmosphere
+			wait until ALTITUDE > BODY:ATM:height.
+
 			lock STEERING to VSL["orient"]().
 			PANELS ON.
 			LIGHTS ON.
