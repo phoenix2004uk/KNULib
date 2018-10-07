@@ -1,0 +1,1 @@
+export({parameter A,B is 3.local D is 0.local F is 90.local H is BODY:rotationAngle+SHIP:geoPosition:LNG. local J is A:OBT:LAN. local K is J+180.if J<H set J to J+360.if K<H set K to K+360.if J<K{set D to J-H.set F to 90-A:OBT:inclination.}else{set D to K-H.set F to 90+A:OBT:inclination.}local L is 360/BODY:rotationPeriod. return List((D-B/2*L)/L+TIME:seconds,F).}).
